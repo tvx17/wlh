@@ -1,0 +1,22 @@
+[
+  {
+    "name": "id",
+    "type": "INT",
+    "length": 11,
+    "notNull": true,
+    "autoIncrement": true
+  },
+  {
+    "name": "Headline",
+    "type": "VARCHAR",
+    "length": 250,
+    "notNull": true,
+    "default": "t(emptyHeadline)"
+  },
+  {
+    "name": "Content",
+    "type": "TEXT",
+    "notNull": true,
+    "default": "t(noText)"
+  }
+]

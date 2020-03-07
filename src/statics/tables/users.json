@@ -1,0 +1,32 @@
+[
+  {
+    "name": "id",
+    "type": "INT",
+    "length": 11,
+    "autoIncrement": true
+  },
+  {
+    "name": "firstname",
+    "type": "VARCHAR",
+    "length": 250,
+    "default": "t(noProjectName)"
+  },
+  {
+    "name": "lastname",
+    "type": "VARCHAR",
+    "length": 250,
+    "default": "t(noProjectName)"
+  },
+  {
+    "name": "pseudonym",
+    "type": "VARCHAR",
+    "length": 50,
+    "default": "t(noProjectName)"
+  },
+  {
+    "name": "short",
+    "type": "VARCHAR",
+    "length": 20,
+    "default": "t(noProjectName)"
+  },
+]

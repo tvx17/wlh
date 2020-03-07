@@ -1,0 +1,14 @@
+{
+  "Projects": [{
+    "name":"",
+    "status":"",
+    "folder":""
+  }],
+  "User": {
+    "Firstname": "",
+    "Lastname": "",
+    "Pseudonym": "",
+    "Short": ""
+  },
+  "Datapath": ""
+}

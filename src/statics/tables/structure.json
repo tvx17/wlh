@@ -1,0 +1,57 @@
+[
+  {
+    "name": "id",
+    "type": "INT",
+    "length": 11,
+    "notNull": true,
+    "autoIncrement": true
+  },
+  {
+    "name": "Label",
+    "type": "VARCHAR",
+    "length": 250,
+    "notNull": true,
+    "default": "t(newStructureEntry)"
+  },
+  {
+    "name": "Type",
+    "type": "VARCHAR",
+    "length": 250,
+    "notNull": true,
+    "default": "t(text)"
+  },
+  {
+    "name": "selectable",
+    "type": "TINYINT",
+    "length": 4,
+    "notNull": true,
+    "default": "1"
+  },
+  {
+    "name": "Root",
+    "type": "TINYINT",
+    "length": 4,
+    "notNull": true,
+    "default": "0"
+  },
+  {
+    "name": "lazy",
+    "type": "TINYINT",
+    "length": 4,
+    "notNull": true,
+    "default": "0"
+  },
+  {
+    "name": "Parent",
+    "type": "INT",
+    "length": 11,
+    "notNull": true,
+    "default": "0"
+  },
+  {
+    "name": "Project",
+    "type": "INT",
+    "length": 11,
+    "notNull": false
+  }
+]

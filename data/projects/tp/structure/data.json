@@ -1,0 +1,37 @@
+{
+  "structure": [
+    {
+      "label": "My first book",
+      "id": "b1",
+      "type": "book",
+      "deletionMode": false,
+      "children": [
+        {
+          "label": "A section",
+          "id": "b1s1",
+          "type": "section",
+          "children": [
+            {
+              "label": "Chapter 1",
+              "id": "b1s1c1",
+              "type": "chapter",
+              "children": [
+                {
+                  "label": "Scene 1",
+                  "id": "b1s1c1sc1",
+                  "type": "scene"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "My second book",
+      "id": "b2",
+      "type": "book",
+      "deletionMode": false
+    }
+  ]
+}

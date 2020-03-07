@@ -1,0 +1,16 @@
+{
+  "step1_headline": "Herzlich willkommen bei WLH - Writer's little helper",
+  "step1_line1": "Du hast das Programm zum ersten Mal gestartet!",
+  "step1_line2": "Lass uns ein paar Einstellungen vornehmen. Diese Einstellungen können später immer wieder korrigiert werden. Das Programm braucht diese Einstellungen aber, damit es fehlerfrei laufen kann.",
+  "step1_line3": "Alle Daten werden nur lokal auf Deinem Rechner gespeichert. Es werden keinerlei Daten irgendwo hin übermittelt.",
+  "step3_headline": "Erstes Projekt",
+  "step3_line1": "Wie soll der Name Deines ersten Projekts sein?",
+  "step4_headline": "Datenspeicherung",
+  "step5":"",
+  "step4_option1_name": "Anwendungsverzeichnis",
+  "step4_option1_description": "Die Daten werden in dem Verzeichnis gespeichert, von welchem diese Anwendung gestartet wurde",
+  "step4_option2_name": "Benutzerverzeichnis",
+  "step4_option2_description": "Die Daten werden im Verzeichnis des aktuellen Benutzers gespeichert",
+  "step4_option3_name": "Selbst definieren",
+  "step4_option3_description": "Die Daten werden in einem selbstdefinierten Verzeichnis gespeichert"
+}

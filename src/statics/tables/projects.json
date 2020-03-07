@@ -1,0 +1,19 @@
+[
+  {
+    "name": "id",
+    "type": "INT",
+    "length": 11,
+    "autoIncrement": true
+  },
+  {
+    "name": "Name",
+    "type": "VARCHAR",
+    "length": 250,
+    "default": "t(noProjectName)"
+  },{
+    "name": "active",
+    "type": "TINYINT",
+    "length": 4,
+    "default": "1"
+  }
+]

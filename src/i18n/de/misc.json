@@ -1,0 +1,11 @@
+{
+  "user": "Benutzer",
+  "firstname": "Vorname",
+  "lastname": "Nachname",
+  "projectname": "Projektname",
+  "short": "Abkürzung",
+  "pseudonym": "Pseudonym",
+  "next": "Weiter",
+  "back": "Zurück",
+  "ready": "Fertig"
+}
