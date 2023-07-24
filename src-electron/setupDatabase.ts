@@ -1,8 +1,8 @@
 import fs from 'fs';
-import { dataDir } from './connection';
+import {dataDir} from './connection';
 
-import { tables } from './tables';
-import { methods } from './requests';
+import {tables} from './tables';
+import {methods} from './requests';
 
 const checkFiles = async () => {
   fs.access(dataDir, async (err) => {
@@ -20,34 +20,57 @@ const initTables = async () => {
   }
 };
 
+const createDataset = async (table: string, dataToInsert: any) => {
+  let id = 0
+  const data = await methods.read(table);
+  if (data.length === 0) {
+    const dataset = tables[table].build(dataToInsert);
+    const row = await dataset.save();
+    id = row.id;
+  }
+  checkCreationErrors(id, table)
+  return id
+}
+const checkCreationErrors = (id: number, table: string) => {
+  if (id === 0) {
+    throw new Error('Problems creating a new data row in table ' + table + '!');
+  }
+}
+
 const insertInitialData = async () => {
-  let userId = 0;
-  const userData = await methods.read('users');
-  if (userData.length === 0) {
-    const user = tables['users'].build({
-      summary: 'default user',
-      firstname: 'Firstname',
-      lastname: 'Lastname',
-      pseudonym: 'Not set',
-      gender: 1,
-      isActive: true,
-      deleted: false,
-    });
-    const row = await user.save();
-    userId = row.id;
-  }
-  const projectData = await methods.getAll('projects');
-  if (projectData.length === 0 && userId !== 0) {
-    const project = tables['projects'].build({
-      summary: 'default project',
-      isActive: true,
-      deleted: false,
-      owner: userId,
-    });
-    await project.save();
-  } else if (projectData.length === 0 && userId === 0) {
-    console.error('Problem creating a new project because the user id was 0');
-  }
+  let id = await createDataset('users', {
+    summary: 'default user',
+    firstname: 'Firstname',
+    lastname: 'Lastname',
+    pseudonym: 'Not set',
+    gender: 1,
+    isActive: true,
+    deleted: false,
+  })
+  const projectId = await createDataset('projects', {
+    summary: 'default project',
+    isActive: true,
+    deleted: false,
+    owner: id,
+  })
+  id = await createDataset('structure', {
+    summary: 'First Scene',
+    isActive: true,
+    deleted: false,
+    project: projectId,
+    type: 'scene',
+    parent: 0,
+    order: 10
+  })
+  await createDataset('texts', {
+    summary: 'Headline of the first scene',
+    description: '',
+    text: '',
+    project: projectId,
+    isActive: true,
+    deleted: false,
+    structureId: id
+  })
 };
 
-export { checkFiles, initTables, insertInitialData };
+export {checkFiles, initTables, insertInitialData};

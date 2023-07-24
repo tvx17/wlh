@@ -1,3 +1,6 @@
+import project from 'src/app/project';
+import user from 'src/app/user';
+
 const runMode = 'app';
 
 const setupCheck = async () => {
@@ -8,9 +11,15 @@ const setupCheck = async () => {
   }
 };
 
+const init= async () => {
+  await project.onStartup()
+  await user.onStartup()
+}
+
 const app = {
-  setupCheck
+  setupCheck,
+  init
 };
 export default app;
 
-export { app,setupCheck };
+export { app,setupCheck, init};

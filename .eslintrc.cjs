@@ -74,6 +74,9 @@ module.exports = {
     'vue/multi-word-component-names': 'off',
     quotes: ['warn', 'single', { avoidEscape: true }],
 
+    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+
     // this rule, if on, would require explicit return type on the `render` function
     '@typescript-eslint/explicit-function-return-type': 'off',
 

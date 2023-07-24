@@ -1,20 +1,22 @@
-import crud from "src/app/crud";
-import store from "src/app/store";
+import crud from 'src/tvx/helper/crud';
+import store from 'src/app/store';
 
 const onStartup = async () => {
+  console.log(localStorage.getItem('currentProjectId'))
   await loadProject(localStorage.getItem('currentProjectId'))
 }
 
 const loadProject = async (id = null) => {
   if (id !== undefined && id == null) {
-    const data = await crud.r({table: 'projects', id: id})
-    store.currentProject.value = data
-    localStorage.setItem('currentProjectId', data.id)
+    crud.readByPk({destination: 'projects', pkValue: id}).then(res => {
+      store.currentProject.value = res
+      localStorage.setItem('currentProjectId', res.id)
+    })
   } else {
-    const data = await crud.r({table: 'projects', getFirst: true})
-
-    store.currentProject.value = data
-    localStorage.setItem('currentProjectId', data.id)
+    crud.readFirst({destination: 'projects'}).then(res => {
+      store.currentProject.value = res
+      localStorage.setItem('currentProjectId', res.id)
+    })
   }
 }
 
@@ -25,4 +27,4 @@ const methods = {
 
 export default methods
 
-export {methods, onStartup, loadProject}
+export {methods, onStartup, loadProject,}

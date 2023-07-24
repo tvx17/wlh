@@ -1,18 +1,17 @@
 import {ref} from "vue";
 
 const currentProject = ref()
-const currentBook= ref()
-const currentChapter= ref()
-const currentScene= ref()
+const currentUser = ref()
 
+
+const contents = ref({type: 'index', mode: ''})
 
 const store = {
   currentProject,
-  currentBook,
-  currentChapter,
-  currentScene
+  currentUser,
+  contents
 }
 
 export default store
 
-export {store, currentProject, currentBook, currentChapter, currentScene}
+export {store, currentProject, contents, currentUser}
