@@ -11,6 +11,9 @@ import eButton from 'src/gui/components/container/toolbarButton.vue';
 // ==========================================================
 import projects from 'src/gui/forms/projects.vue';
 import users from 'src/gui/forms/users.vue';
+import books from 'src/gui/forms/books.vue';
+import chapters from 'src/gui/forms/chapters.vue';
+import texts from 'src/gui/forms/texts.vue';
 
 // ---------------------------------------------------- Props
 // ==========================================================
@@ -39,6 +42,9 @@ const { v, m, on } = useListContainer(props.form);
       q-btn(class="full-width" dense flat icon="fa-solid fa-save" size="sm" )
       projects(v-if="props.form === 'projects'")
       users(v-if="props.form === 'users'")
+      books(v-if="props.form === 'books'")
+      chapters(v-if="props.form === 'chapters'")
+      texts(v-if="props.form === 'texts'")
   //<!--  {{variables.splitter}}
 
   //<q-splitter v-model="variables.splitter.value" :limits="[0, 100]">

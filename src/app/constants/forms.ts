@@ -31,6 +31,20 @@ export const forms = {
     header: 'Users',
     type: 'list',
     table: 'users'
+  },
+  chapters: {
+    minDatasets: 1,
+    form: 'chapters',
+    header: 'Chapters',
+    type: 'list',
+    table: 'chapters'
+  },
+  texts: {
+    minDatasets: 1,
+    form: 'texts',
+    header: 'Texts',
+    type: 'list',
+    table: 'texts'
   }
 };
 

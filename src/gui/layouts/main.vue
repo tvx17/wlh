@@ -52,15 +52,15 @@ onMounted(async() => {
             q-item-section
               q-item-label
                 | {{ $t('layouts.main.storylines') }}
-          q-item(clickable)
+          q-item(clickable to="/books")
             q-item-section
               q-item-label
                 | {{$t('layouts.main.books')}}
-          q-item(clickable)
+          q-item(clickable to="/chapters")
             q-item-section
               q-item-label
                 | {{$t('layouts.main.chapters')}}
-          q-item(clickable)
+          q-item(clickable to="/texts")
             q-item-section
               q-item-label
                 | {{$t('layouts.main.scenes')}}

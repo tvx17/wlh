@@ -5,7 +5,7 @@ import listContainer from 'src/gui/components/container/list.vue';
 
 <template lang="pug">
   q-page
-    list-container(form='texts')
+    list-container(form='books')
 </template>
 
 <style>
