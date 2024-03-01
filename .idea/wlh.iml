@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../_wlh" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.quasar" />
+      <excludeFolder url="file://$MODULE_DIR$/.vscode" />
+    </content>
+    <content url="file://$USER_HOME$/.wlh" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="SonarLintModuleSettings">
+    <option name="uniqueId" value="50a4013c-15fb-4c6a-a3ab-319cba92822b" />
+  </component>
+</module>
