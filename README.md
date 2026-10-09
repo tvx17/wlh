@@ -87,6 +87,35 @@ Custom locales need a real locale mapping if used for Intl date/number formattin
 The default fetch loader targets browser SPA/PWA usage; SSR callers must supply
 an absolute base URL/fetcher to the service factory.
 
+### Electron backend bridge
+
+Import the asynchronous bridge from any renderer component or service:
+
+```ts
+import { execute } from "@/core/app/bridge";
+
+const info = await execute("app.info");
+```
+
+`execute(command, payload?)` returns a `Promise<unknown>` and rejects on backend
+errors or when used outside Electron. Pass structured-clone-compatible payloads
+and results (plain objects, arrays, strings, numbers); catch errors at the caller.
+
+The preload exposes `window.appBridge.execute`, which invokes the fixed IPC
+channel `execute`. The main process validates the calling window/document and
+dispatches through `src-electron/execute.ts`. Register additional named commands
+in the handler map in `electron-main.ts`; each handler validates its payload.
+Unknown commands reject. The example `app.info` returns name, version, and platform.
+Context isolation and sandboxing stay enabled; renderer Node integration is disabled.
+
+Use `npx quasar dev -m electron` for development and
+`npx quasar build -m electron --skip-pkg` to verify the Electron build.
+Run `npm run test:bridge` for bridge and dispatcher tests.
+For an actual IPC smoke test, build Electron first, then run
+`src-electron/node_modules/electron/dist/electron.exe tests/electron-bridge-smoke.cjs`.
+The test uses an invisible window and the built preload, checks results and
+error propagation, and exits automatically.
+
 ### Customize the configuration
 
 See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-file).

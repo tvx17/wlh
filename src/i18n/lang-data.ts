@@ -100,7 +100,9 @@ export function createLangDataService(
     validateSegment(file, "file");
     validateSegment(namespace, "namespace");
     if (typeof directory !== "string") {
-      throw new Error("Directory is required; use an empty string for the root");
+      throw new Error(
+        "Directory is required; use an empty string for the root"
+      );
     }
     if (directory) {
       for (const segment of directory.split("/"))

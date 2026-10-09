@@ -22,10 +22,16 @@
  * https://www.electronjs.org/docs/latest/tutorial/tutorial-preload
  */
 
-import { contextBridge } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
+import type { AppBridge } from "../src/core/app/bridge";
 import { quasarRuntime } from "#q-app/electron/preload";
 
 /**
  * Can be used in the renderer process through `window.quasarRuntime`
  */
 contextBridge.exposeInMainWorld("quasarRuntime", quasarRuntime);
+
+const appBridge: AppBridge = {
+  execute: (command, payload) => ipcRenderer.invoke("execute", command, payload)
+};
+contextBridge.exposeInMainWorld("appBridge", appBridge);

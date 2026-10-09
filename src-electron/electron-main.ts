@@ -1,6 +1,12 @@
-import { BrowserWindow, app } from "electron";
+import { BrowserWindow, app, ipcMain, type WebContents } from "electron";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import os from "node:os";
+import {
+  createExecutor,
+  isTrustedDocument,
+  type CommandHandler
+} from "./execute";
 import {
   registerQuasarRuntime,
   resolveElectronAssetsPath
@@ -8,6 +14,16 @@ import {
 
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform();
+const trustedWindows = new WeakMap<WebContents, string>();
+
+const execute = createExecutor(
+  new Map<string, CommandHandler>([
+    [
+      "app.info",
+      () => ({ name: app.getName(), version: app.getVersion(), platform })
+    ]
+  ])
+);
 
 async function createWindow() {
   /**
@@ -20,10 +36,17 @@ async function createWindow() {
     useContentSize: true,
     webPreferences: {
       contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
       // https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
       preload: path.join(import.meta.dirname, "electron-preload.cjs")
     }
   });
+
+  const trustedUrl = import.meta.env.QUASAR_DEV
+    ? import.meta.env.QUASAR_APP_URL
+    : pathToFileURL(path.join(app.getAppPath(), "index.html")).href;
+  trustedWindows.set(mainWindow.webContents, trustedUrl);
 
   if (import.meta.env.QUASAR_DEV) {
     await mainWindow.loadURL(import.meta.env.QUASAR_APP_URL);
@@ -44,6 +67,17 @@ async function createWindow() {
 
 void app.whenReady().then(() => {
   registerQuasarRuntime();
+  ipcMain.handle("execute", (event, command: unknown, payload: unknown) => {
+    const expectedUrl = trustedWindows.get(event.sender);
+    if (
+      !expectedUrl ||
+      event.senderFrame !== event.sender.mainFrame ||
+      !isTrustedDocument(event.senderFrame.url, expectedUrl)
+    ) {
+      throw new Error("Unauthorized execute request");
+    }
+    return execute(command, payload);
+  });
   void createWindow();
 
   app.on("activate", () => {

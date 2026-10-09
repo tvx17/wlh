@@ -1,5 +1,77 @@
 # Aktionsprotokoll
 
+## Electron-Bridge – Implementierung und laufende Prüfung
+
+- Zuerst `Get-Content AGENTS.md,ACTIONS.md` ausgeführt; nach erneuter
+  Dokumentationsanweisung nochmals gelesen. `git status --short` geprüft.
+- `rg --files src-electron src/core` und `Get-Content` für Main, Preload,
+  Electron-Paketdatei, `env.d.ts`, `package.json`, `.quasar/tsconfig.json`
+  und README ausgeführt. `src/core` existierte noch nicht.
+- URLs aufgerufen: https://www.electronjs.org/docs/latest/tutorial/ipc
+  und https://www.electronjs.org/docs/latest/tutorial/security.
+- Mit `rg` Electron-Typen und Quasars Option `--skip-pkg` lokal geprüft.
+- Per `apply_patch` `src/core/app/bridge.ts` mit `execute(command, payload?)`
+  und Backend-Dispatcher `src-electron/execute.ts` erstellt. Preload stellt
+  `window.appBridge.execute` bereit; IPC-Kanal heißt `execute`.
+  Main prüft Fenster, Hauptframe und Dokument-URL. Beispielbefehl: `app.info`.
+  README, Tests und npm-Skript `test:bridge` ergänzt.
+- `npx oxfmt src/core/app/bridge.ts src-electron/execute.ts src-electron/electron-main.ts src-electron/electron-preload.ts tests/bridge.test.mjs package.json README.md`:
+  erfolgreich. `npx oxlint` meldete zunächst einen redundanten Union-Typ;
+  per Patch korrigiert. `npm run typecheck`: erfolgreich mit Router-Hinweis.
+- `npm run test:bridge`: Sandbox blockiert Test-Unterprozess mit `spawn EPERM`.
+  Wiederholung außerhalb der Sandbox angefordert; Werkzeugaufruf wurde durch
+  die neue Benutzernachricht unterbrochen. Tests werden erneut geprüft.
+- `npx quasar build -m electron --skip-pkg` gestartet;
+  abschließendes Build-Ergebnis wird noch geprüft. Keine Commits erstellt.
+
+### Abschluss der Electron-Prüfung
+
+- `npm run test:bridge` nach Freigabe: alle drei Tests erfolgreich.
+  `write_stdin` konnte den früheren Build-Prozess nach der Unterbrechung nicht
+  mehr finden; Build erneut gestartet mit
+  `npx quasar build -m electron --skip-pkg *> electron-bridge-build.log` und
+  `Get-Content electron-bridge-build.log -Tail 25`.
+- Sandbox-Build erkannte den Paketmanager nicht. Wiederholung außerhalb der
+  Sandbox erfolgreich: Main, Preload und Electron-UI gebaut. Quasar installierte
+  dabei automatisch `@electron/packager` in `src-electron`; Paketdateien geprüft
+  mit `git diff -- src-electron/package.json` und
+  `git diff --numstat -- src-electron/package-lock.json`.
+- `npm run typecheck`, `npx oxlint`, `git diff --check` erfolgreich.
+  `npm run lint:check` wegen `spawn EPERM` außerhalb der Sandbox wiederholt:
+  drei Formatabweichungen. Die aus der vorherigen Arbeit stammende Abweichung
+  in `src/i18n/lang-data.ts` mit `npx oxfmt src/i18n/lang-data.ts` korrigiert.
+  Auch die von Quasar geänderte Electron-Paketdatei wird formatiert;
+  verbleibende Abweichung betrifft die vorhandene PWA-Paketdatei.
+- Gebaute Dateien mit `Get-ChildItem dist/electron -Recurse -Filter '*preload*'`
+  und `.quasar` geprüft; Quasars `electron-builder.js` mit `Get-Content` gelesen.
+- `tests/electron-bridge-smoke.cjs` per Patch erstellt und mit
+  `npx oxfmt tests/electron-bridge-smoke.cjs` formatiert. Echter IPC-Test mit
+  gebautem Preload, Kontextisolierung und unsichtbarem Fenster.
+- Ausgeführt: `Start-Process -FilePath '.\src-electron\node_modules\electron\dist\electron.exe' -ArgumentList 'tests/electron-bridge-smoke.cjs' -WindowStyle Hidden -PassThru -Wait -RedirectStandardOutput '.\electron-bridge-smoke.log' -RedirectStandardError '.\electron-bridge-smoke-error.log'`;
+  beide Logs mit `Get-Content` gelesen und Exitcode geprüft.
+- Erster Smoke-Test scheiterte wegen fehlender Quasar-Runtime-Listener im
+  Testaufbau. Gebauten Preload und Quasars `main-runtime.js` mit `rg`/`Get-Content`
+  geprüft und Listener ergänzt. Ein Patch musste an die formatierte Datei
+  angepasst werden. Zweiter Test erfolgreich; erwarteter Backend-Fehler wird
+  korrekt an den Renderer weitergereicht und im Testlog ausgegeben.
+- Abschließend `npm run test:bridge`, `npm run test:i18n`, `npm run build`,
+  `npm run typecheck`, `npm run lint:check`, `npx oxlint` sowie
+  `git diff --check`/`git status --short` für Abschlussprüfung verwendet.
+  Temporäre eigene Build-/Smoke-Logs anschließend mit `Remove-Item -LiteralPath`
+  entfernt. README und Protokoll ergänzt; kein Commit erstellt.
+- Ergebnis der Abschlussprüfung: drei Bridge-Tests, fünf Übersetzungstests,
+  Typecheck, Oxlint, SPA-Build und Electron-Build erfolgreich; echter IPC-Smoke-
+  Test erfolgreich. Finale Formatprüfung außerhalb der Sandbox bestätigt nur
+  die bestehende Abweichung in `src-pwa/package.json`. Temporäre Logs entfernt.
+
+## Dokumentationsanweisung erneut gelesen
+
+- Zuerst `Get-Content -LiteralPath AGENTS.md,ACTIONS.md` ausgeführt.
+  Ergebnis: Richtlinien und bisherige Arbeiten vollständig gelesen.
+- Diesen Schritt per `apply_patch` dokumentiert. Keine URLs aufgerufen;
+  keine Änderungen am Anwendungscode. Weitere Aktionen werden hier mit
+  Befehlen, URLs und Ergebnissen protokolliert.
+
 ## Dynamische Übersetzungen umgesetzt
 
 - Zuerst `Get-Content AGENTS.md,ACTIONS.md,src/boot/i18n.ts,src/i18n/index.ts,src/i18n/en-US/index.ts,package.json,quasar.config.ts`

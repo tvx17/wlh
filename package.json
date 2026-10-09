@@ -14,6 +14,7 @@
   ],
   "type": "module",
   "scripts": {
+    "test:bridge": "node --test tests/bridge.test.mjs",
     "test:i18n": "node --test tests/lang-data.test.mjs",
     "lint": "oxfmt && oxlint --fix",
     "lint:check": "oxfmt --check && oxlint",
