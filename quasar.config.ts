@@ -64,6 +64,7 @@ export default defineConfig(ctx => {
         [
           "@intlify/unplugin-vue-i18n/vite",
           {
+            runtimeOnly: false,
             // if you want to use Vue I18n Legacy API, you need to set `compositionOnly: false`
             // compositionOnly: false,
 

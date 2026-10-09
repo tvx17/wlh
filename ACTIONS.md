@@ -1,5 +1,57 @@
 # Aktionsprotokoll
 
+## Dynamische Übersetzungen umgesetzt
+
+- Zuerst `Get-Content AGENTS.md,ACTIONS.md,src/boot/i18n.ts,src/i18n/index.ts,src/i18n/en-US/index.ts,package.json,quasar.config.ts`
+  sowie `rg --files src/pages` und `Get-Content tsconfig.json` ausgeführt.
+  Startseite/App mit `Get-Content` und Zustand mit `git status --short` geprüft.
+- URLs aufgerufen: https://vue-i18n.intlify.dev/guide/advanced/lazy
+  und https://vue-i18n.intlify.dev/guide/advanced/optimization.
+- Mit `rg -n 'runtimeOnly|compositionOnly|dropMessageCompiler'` in den lokalen
+  Quasar-/Intlify-Paketen Compiler-Konfiguration geprüft. `node --version`:
+  Node 24.18.0. `Get-Content oxlint.config.ts` für Prüfregeln verwendet.
+  `rg`-Suche nach `BASE_URL|publicPath` in `.quasar` und Quasar-`config-tools.js`:
+  Vite verwendet `build.publicPath` als Basis. Zwei nicht existierende Suchpfade
+  meldeten Fehler; der tatsächlich vorhandene Quasar-Code wurde gefunden.
+- Änderungen mit `apply_patch` erstellt. Der erste Patch wurde wegen doppeltem
+  Dateiziel abgelehnt und hatte keine Wirkung; Boot-Datei anschließend per
+  PowerShell-Here-String und `Set-Content src/boot/i18n.ts -Encoding utf8` ersetzt.
+- Übersetzungsdienst und `useLangData()` ergänzt: Pflicht-Namespace, verschachtelte
+  Pfade, Referenzen, automatisches Entladen, geordnete Ladeoperationen und
+  atomarer Sprachwechsel. Fehler erhalten den bisherigen Sprachzustand.
+  JSON-Beispiele unter `public/locales/{de,en,xx}/components/eins.json` erstellt.
+  Alte statische Beispieldaten entfernt; Runtime-Compiler aktiviert.
+- Startseitenbeispiel und README-Anleitung ergänzt; Node-/Vue-Lifecycle-Tests
+  unter `tests/lang-data.test.mjs`, npm-Skript `test:i18n` hinzugefügt.
+- Formatierung: `npx oxfmt src/boot/i18n.ts src/i18n/lang-data.ts src/composables/useLangData.ts src/components/LanguageDataExample.vue 'src/pages/index/(index).vue' tests/lang-data.test.mjs package.json README.md`.
+  Sandbox blockierte zunächst Unterprozesse mit `spawn EPERM`; nach Freigabe
+  erfolgreich. Gleiches galt für `npm run test:i18n`. TypeScript-/Lint-Fehler
+  bei Closure-Narrowing, Methodenbindung und Test-Promises korrigiert.
+- Prüfungen: `npm run test:i18n` (fünf Tests erfolgreich), `npm run typecheck`
+  und `npm run build` erfolgreich; `npx oxlint` erfolgreich.
+  `npm run lint:check` scheitert weiterhin ausschließlich an vorhandenen
+  Formatproblemen in `src-electron/package.json` und `src-pwa/package.json`.
+  Geänderte Dateien sind formatiert. Router-`rootDir`-Hinweis bleibt bestehen.
+- Zusätzlich `npx oxfmt --check` für geänderte Dateien, `git diff --check`,
+  `git diff --stat` und `git status --short` verwendet. Dokumentationsüberschriften
+  sowie `runtimeOnly` mit `rg -n` kontrolliert.
+- Browserwerkzeuge über die Tool-Metadaten gesucht; keine vorhanden.
+  Keine manuelle Browserprüfung durchgeführt. Die tatsächliche Vue-Komponenten-
+  Entsorgung wurde mit einem Vue-Test-Renderer überprüft. Keine weiteren
+  Pakete installiert und keinen Commit erstellt. Protokoll per Patch ergänzt.
+
+## Prüfung eigener Sprachcodes
+
+- `Get-Content AGENTS.md,ACTIONS.md` ausgeführt.
+- URLs geprüft: https://vue-i18n.intlify.dev/guide/essentials/scope.html
+  und https://vue-i18n.intlify.dev/guide/essentials/number.html.
+- Mit `node --input-type=module -e` und `createI18n({ legacy: false,
+  locale: "xx", messages: { xx: { welcome: "Eigene Sprache" } } })`
+  sowie `i18n.global.t("welcome")` eigene Locale geprüft.
+  Ergebnis: „Eigene Sprache“. `xx` funktioniert für Übersetzungstexte;
+  Intl-Formatierung benötigt eine unterstützte reale Locale als Zuordnung.
+- Dokumentation per `apply_patch` ergänzt; keine Implementierung geändert.
+
 Alle weiteren Arbeiten dieser Sitzung hier kurz mit Zweck, Änderungen,
 Befehlen, aufgerufenen URLs und Ergebnis ergänzen. Keine Geheimnisse protokollieren.
 

@@ -6,6 +6,7 @@
         src="~@/assets/quasar-logo-vertical.svg"
         style="width: 200px; height: 200px"
       />
+      <LanguageDataExample />
 
       <q-btn
         class="q-mt-md"
@@ -19,5 +20,5 @@
 </template>
 
 <script setup lang="ts">
-//
+import LanguageDataExample from "@/components/LanguageDataExample.vue";
 </script>
