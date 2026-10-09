@@ -32,12 +32,14 @@
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^11.0.0",
     "@quasar/app-vite": "^3.5.0",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^22.19.11",
     "autoprefixer": "^10.4.27",
     "oxfmt": "^0.x",
     "oxlint": "^1.x",
     "oxlint-tsgolint": "^7.0.2001",
     "postcss": "^8.5.8",
+    "tailwindcss": "^4.3.3",
     "typescript": "^6.0.0",
     "vue-tsc": "^3.3.3"
   },

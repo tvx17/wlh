@@ -53,3 +53,40 @@ codex resume '01a11f05-cceb-7ef3-bc0b-a834920c4c78' --cd $PSScriptRoot $resumePr
 ```
 
 Voraussetzung: Codex CLI im PATH, Anmeldung und lokal verfügbare Sitzungsdaten.
+
+## 2026-10-09 – Anweisungen zur Fortsetzung gelesen
+
+- Zuerst `Get-Content -LiteralPath AGENTS.md,ACTIONS.md` ausgeführt.
+  Ergebnis: Repository-Richtlinien und bisheriges Aktionsprotokoll gelesen.
+- Diesen Eintrag mit `apply_patch` ergänzt. Weitere Aktionen werden hier
+  mit Befehlen, URLs und Ergebnissen dokumentiert. Keine URLs aufgerufen.
+
+## 2026-10-09 – Tailwind CSS hinzugefügt
+
+- Zuerst `Get-Content AGENTS.md,ACTIONS.md,package.json,src/css/app.scss`,
+  `git status --short` und `rg -n 'extendViteConf|vitePlugins|css:' quasar.config.ts`
+  ausgeführt; anschließend Quasar-Konfiguration und README gelesen.
+- Dokumentation aufgerufen: https://tailwindcss.com/docs/installation/using-vite
+  und https://tailwindcss.com/docs/preflight.
+- `npm install --save-dev tailwindcss @tailwindcss/vite`: Version 4.3.3 installiert,
+  Paketdateien aktualisiert. npm meldete vier hohe Sicherheitsbefunde sowie
+  nicht freigegebene Installationsskripte; keine pauschalen Dependency-Fixes ausgeführt.
+- Per `apply_patch` Vite-Plugin registriert, `src/css/tailwind.css` eingebunden
+  und README ergänzt. Präfix `tw:` vermeidet Quasar-Klassenkonflikte;
+  Preflight ausgelassen, damit Quasar seine Basisstile behält.
+- `npm run build` und `npm run typecheck`: erfolgreich. Typecheck meldete
+  einen Hinweis zum fehlenden Router-`rootDir`.
+- `npm run lint:check`: bestehende Formatprobleme in `src-electron/package.json`
+  und `src-pwa/package.json`. Diese Dateien nicht geändert.
+- `npx oxfmt --check quasar.config.ts src/css/tailwind.css README.md package.json`
+  und `npx oxlint`: erfolgreich. Änderungen mit `git diff --stat`,
+  `git diff -- package.json quasar.config.ts README.md` und `git status --short`
+  geprüft. Keine manuelle Browserprüfung durchgeführt.
+- Lokaler Commit-Befehl: `git add package.json package-lock.json quasar.config.ts src/css/tailwind.css README.md ACTIONS.md`,
+  anschließend `git commit -m "Added Tailwindcss"`.
+  Abschlussprüfung: `git log -1 --format='%h %s'` und `git status --short`.
+- Erster Commit-Versuch scheiterte an Sandbox-Schreibrechten für `.git/index.lock`.
+  Nach Freigabe erfolgreich lokal committed: `Added Tailwindcss`.
+  Arbeitsverzeichnis anschließend sauber. Dieses Ergebnis mit `apply_patch`
+  ergänzt und mittels `git add ACTIONS.md` und
+  `git commit --amend --no-edit` in denselben Commit aufgenommen.
