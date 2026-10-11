@@ -1,0 +1,9 @@
+{
+  "title": "WLH – Project foundation",
+  "language": "Language",
+  "toggle": "Load / unload component",
+  "backend": "Electron connection",
+  "message": "Message",
+  "send": "Send",
+  "browser": "The backend connection is only available in the Electron app."
+}

@@ -1,0 +1,9 @@
+{
+  "title": "WLH – Projektgrundlage",
+  "language": "Sprache",
+  "toggle": "Komponente laden / entladen",
+  "backend": "Electron-Verbindung",
+  "message": "Nachricht",
+  "send": "Senden",
+  "browser": "Die Backend-Verbindung ist nur in der Electron-App verfügbar."
+}
