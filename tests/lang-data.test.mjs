@@ -1,23 +1,22 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createI18n } from "vue-i18n";
-import { createLangDataService } from "../src/i18n/lang-data.ts";
-import { langDataKey } from "../src/i18n/lang-data.ts";
+import { createLangDataService, langDataKey } from "@/core/app/lang-data.ts";
 import { readFile } from "node:fs/promises";
 import { transpileModule } from "typescript";
 import { createRenderer, h } from "vue";
 
 // Resolve the app alias for Node while exercising the actual composable source.
 const composableSource = await readFile(
-  new URL("../src/composables/useLangData.ts", import.meta.url),
+  new URL(import.meta.resolve("@/core/composables/useLangData.ts")),
   "utf8"
 );
 const compiled = transpileModule(composableSource, {
   compilerOptions: { module: 99, target: 99 }
 })
   .outputText.replace(
-    '"@/i18n/lang-data"',
-    JSON.stringify(new URL("../src/i18n/lang-data.ts", import.meta.url).href)
+    '"@/core/app/lang-data"',
+    JSON.stringify(import.meta.resolve("@/core/app/lang-data.ts"))
   )
   .replace('"vue"', JSON.stringify(import.meta.resolve("vue")))
   .replace('"vue-i18n"', JSON.stringify(import.meta.resolve("vue-i18n")));

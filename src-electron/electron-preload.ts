@@ -23,7 +23,7 @@
  */
 
 import { contextBridge, ipcRenderer } from "electron";
-import type { AppBridge } from "../src/core/app/bridge";
+import type { AppBridge } from "@/core/app/bridge";
 import { quasarRuntime } from "#q-app/electron/preload";
 
 /**

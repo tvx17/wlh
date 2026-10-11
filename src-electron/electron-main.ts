@@ -6,7 +6,7 @@ import {
   createExecutor,
   isTrustedDocument,
   type CommandHandler
-} from "./execute";
+} from "@electron/execute";
 import {
   registerQuasarRuntime,
   resolveElectronAssetsPath

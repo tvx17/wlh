@@ -1,5 +1,213 @@
 # Aktionsprotokoll
 
+## 2026-10-11 – Folio: Roman-Schreibraum gestalten
+
+- Zuerst `Get-Content -LiteralPath AGENTS.md,ACTIONS.md` ausgeführt.
+  Mit `rg --files src public tests`, `Get-Content` für Layout, Seiten, Router,
+  Stores, Sprachdienst, Styles, Mock-Daten, README und Lint-Konfigurationen
+  sowie `git status --short` den vorhandenen Stand geprüft.
+  Browserwerkzeuge über Tool-Metadaten gesucht: keine vorhanden.
+- Per `apply_patch` Folio-Oberfläche angelegt: responsive Login-/Übersichtsseite,
+  Projekt-, Buch-, Figuren- und Ortsansichten, Szeneneditor mit aufklappbaren
+  Inline-Panels links/rechts/unten, Fokusmodus und mobiler Navigation.
+  Bestehendes Drawer-Beispiellayout ersetzt. Erster Austausch-Patch wurde wegen
+  doppeltem Dateiziel ohne Wirkung abgelehnt; anschließend getrennt angewandt.
+- Mock-Daten über `@/mockData.js` angebunden. Pinia-Stores für lokale Demo-Sitzung,
+  Entwürfe, Notizen, Projekte und Einstellungen erstellt. Login speichert keine
+  Passwörter; Router schützt Demo-Seiten vor Aufruf ohne lokale Sitzung.
+  Alle neuen Projektimporte beginnen mit vollständigem `@`-Alias.
+- Sprachtexte unter `public/locales/{de,en}/gui/studio.json` erstellt;
+  App lädt Namespace `studio` über vorhandenen Dienst. Sprachwahl, Textsprache
+  des Manuskripts und Entwürfe bleiben getrennt. README ergänzt.
+- `npm run typecheck; npx oxlint`: zunächst Typfehler bei optionalen Mock-Feldern
+  und Slider-Werten; per Patch korrigiert. Kleine Slider-Korrektur mit
+  `Get-Content -Raw`, `.Replace(...)` und `Set-Content` ausgeführt.
+  `npm run typecheck` danach erfolgreich (bestehender Router-Hinweis).
+- `npx oxfmt` für App, Boot, neue Core-Dateien, Router, Komponenten, Seiten,
+  Styles, Übersetzungs-JSON und README: Sandbox meldete `spawn EPERM`;
+  identischer Befehl außerhalb der Sandbox erfolgreich (25 Dateien).
+- `Test-Path src-electron/node_modules/electron/dist/electron.exe` bestätigt
+  vorhandenes Electron. `tests/studio-smoke.cjs` per Patch für echte
+  Desktop-/Mobile-Bedienprüfung und Vorschauaufnahmen angelegt.
+  Bisher keine externen URLs aufgerufen; Validierung läuft noch.
+
+### Validierung und Abschluss
+
+- `npx oxfmt tests/studio-smoke.cjs`, anschließend Formatierungen der korrigierten
+  Store-/Editor-/CSS-/Testdateien: erfolgreich. `Get-Content` und `rg -n` für
+  aktuelle Styles, generierte Routentypen, Store-/Editordateien und lokale
+  Electron-Typen (`capturePage`, `offscreen`) zur Kontrolle verwendet.
+- `npm run build *> studio-build.log` und `Get-Content studio-build.log -Tail 20`:
+  Sandbox konnte Sass nicht starten; außerhalb der Sandbox erfolgreich.
+  Nach Textsprach- und Lesbarkeitskorrektur erneut erfolgreich gebaut.
+- Echte Browserprüfung ausgeführt mit:
+
+  ```powershell
+  $studioSmoke = Start-Process -FilePath '.\src-electron\node_modules\electron\dist\electron.exe' -ArgumentList 'tests/studio-smoke.cjs' -WindowStyle Hidden -PassThru -Wait -RedirectStandardOutput '.\studio-smoke.log' -RedirectStandardError '.\studio-smoke-error.log'
+  Get-Content '.\studio-smoke.log'
+  Get-Content '.\studio-smoke-error.log'
+  exit $studioSmoke.ExitCode
+  ```
+
+- Erste Testläufe scheiterten an Icon-Texten im Testselektor (Button und
+  Abmeldemenü), nicht an der Bedienung. Selektoren korrigiert. Vorschauaufnahmen
+  zunächst teilweise veraltet; Offscreen-Rendering im Test aktiviert.
+  Aufnahmen mit `view_image` visuell geprüft: Desktop-/Mobile-Login,
+  Übersicht, Editor und Fokusmodus.
+- Lokale Test-URLs: `http://127.0.0.1:56361/`, `:59593/`, `:50500/`,
+  zuletzt `http://127.0.0.1:56266/`. Im Test Hash-Routen `/login`, `/`,
+  `/projects`, `/books?project=<Projekt-ID>`, `/characters` und
+  `/editor?scene=<Szenen-ID>` geöffnet. Sprachdateien tatsächlich geladen:
+  `http://127.0.0.1:56266/locales/de/gui/studio.json` und
+  `http://127.0.0.1:56266/locales/en/gui/studio.json`.
+  Testserver danach beendet; keine externen URLs aufgerufen.
+- Finaler Browserlauf erfolgreich (Exitcode 0): Demo-Login, Routenschutz,
+  Navigation, Projekterstellung/-suche, Figuren-/Szenenverknüpfung, Textbearbeitung,
+  Notizen, Speicherung nach Reload, DE/EN-Wechsel, getrennte Textsprache,
+  `.txt`-Export und Fokusmodus. Desktop sowie 390-/320-Pixel-Breiten geprüft;
+  keine horizontalen Überläufe oder Browserfehler. Vorschauen und Testexport
+  liegen unter `.quasar/studio-preview/`.
+- `npm run typecheck`, `npx oxlint`, `git diff --check`: erfolgreich.
+  `npm run test:i18n` und `npm run test:bridge` außerhalb der Sandbox:
+  alle acht bestehenden Tests erfolgreich. Bestehender Router-Hinweis bleibt.
+- `npx quasar build -m electron --skip-pkg *> studio-electron-build.log`
+  mit `Get-Content studio-electron-build.log -Tail 16`: erfolgreich;
+  neue Oberfläche auch für Electron gebaut.
+- `npm run lint:check`: vorhandene Formatabweichungen in
+  `src-pwa/package.json` und der vom Benutzer bereitgestellten `src/mockData.js`.
+  Diese Daten/Paketdateien nicht verändert. Neue und geänderte UI-Dateien
+  formatiert. Relative Projektimporte mit `rg -n` ausgeschlossen;
+  `git diff --stat` und `git status --short` geprüft.
+- Protokoll per Patch ergänzt; eigene temporäre Build-/Testlogs mit
+  `Remove-Item -LiteralPath studio-build.log,studio-electron-build.log,
+  studio-smoke.log,studio-smoke-error.log` entfernt. AGENTS.md unverändert;
+  keine neuen Pakete installiert und kein Commit erstellt.
+
+## 2026-10-11 – Zugänglichkeit von mockData.js geprüft
+
+- Zuerst `Get-Content -LiteralPath AGENTS.md,ACTIONS.md` ausgeführt.
+- Datei mit `rg --files --hidden -g '*mockData*' -g AGENTS.md
+  -g '!node_modules/**' -g '!.git/**' -g '!.quasar/**' -g '!dist/**'`
+  gefunden; `git status --short` geprüft. Speicherort: `src/mockData.js`.
+- `Get-Content -LiteralPath quasar.config.ts,package.json,tsconfig.json`
+  und `rg -n 'mockData|publicDir|publicPath|devServer|port:' src src-electron
+  README.md quasar.config.ts`: Konfiguration und Verwendung geprüft.
+  Datei wird noch von keiner Komponente eingebunden.
+- `Get-Item -LiteralPath src/mockData.js`, `Get-Content` mit `-First 65`
+  und `-Tail 25`, Export-Suche mit `rg -n` sowie
+  `Get-Content -LiteralPath .quasar/tsconfig.json,scripts/register-aliases.mjs`:
+  gültiges ES-Modul mit benannten Exporten; Alias `@/` zeigt auf `src`.
+- `Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue` mit
+  Filter für Ports 9000–9010 lieferte keine Daten; kein HTTP-Abruf durchgeführt.
+- Syntax und Alias-Import erfolgreich geprüft, einschließlich zwei Helfern:
+
+  ```powershell
+  node --check src/mockData.js
+  node --import ./scripts/register-aliases.mjs --input-type=module -e 'import assert from "node:assert/strict"; import * as data from "@/mockData.js"; assert.ok(data.projects.length > 0); assert.ok(data.books.length > 0); assert.ok(Array.isArray(data.getChapters(data.books[0].id))); assert.ok(Array.isArray(data.getScenes(data.chapters[0].id))); console.log(JSON.stringify({exports: Object.keys(data).length, projects: data.projects.length, books: data.books.length, chapters: data.chapters.length, scenes: data.scenes.length, aliasImport: "OK", helpers: "OK"}));'
+  ```
+
+- Ergebnis: 28 Exporte, zwei Projekte, zwei Bücher, drei Kapitel, sieben Szenen.
+  Zugriff im Anwendungscode über `@/mockData.js` möglich. Eine direkt unter
+  `/mockData.js` bereitgestellte Datei in `public/` besteht derzeit nicht.
+  Keine URLs aufgerufen, keine Anwendungsdateien geändert; Protokoll per Patch
+  ergänzt.
+
+## 2026-10-11 – Dokumentationsvorgabe erneut gelesen
+
+- Zuerst `Get-Content -LiteralPath AGENTS.md,ACTIONS.md` ausgeführt;
+  Richtlinien und bisherige Aktionen gelesen.
+- Eintrag per `apply_patch` ergänzt. Keine URLs aufgerufen.
+  Für die angefragte `public/mockData.js` fehlt weiterhin der angekündigte
+  Code; um Nachreichen gebeten. Keine Anwendungsdateien geändert.
+
+## 2026-10-11 – Lokale Testdaten angefragt
+
+- Zuerst `Get-Content -LiteralPath AGENTS.md,ACTIONS.md` ausgeführt.
+- Mit `rg --files public -g AGENTS.md -g '*mock*'` und
+  `Test-Path -LiteralPath public/mockData.js` geprüft: keine passende Datei
+  vorhanden. `public/` ist laut Repository-Richtlinien für direkt erreichbare
+  Dateien vorgesehen.
+- Der angekündigte Code fehlt in der Nachricht; um Nachreichen gebeten.
+  Ziel ist `public/mockData.js`. Noch keine Testdatendatei erstellt und keine
+  URLs aufgerufen. Diesen Eintrag per `apply_patch` ergänzt.
+
+## 2026-10-11 – Umorganisation integrieren
+
+- Abschließend `Get-Content AGENTS.md`, `Get-Content ACTIONS.md -First 85`
+  bzw. `-Tail 90`, `git status --short` und die Electron-Testdatei gelesen.
+- `npx oxfmt` für die geänderten Dateien sowie
+  `npx oxfmt quasar.config.ts STRUCTURE-SNAPSHOT.md`: erfolgreich nach
+  Wiederholung außerhalb der Sandbox wegen blockierter Unterprozesse.
+- Quasars Einstiegspunkte per Patch auf Repository-Pfade korrigiert:
+  absolute Windows-Pfade erzeugten zunächst ungültige generierte Imports.
+  Die Konfiguration verwendet weiterhin vollständige `@`-Pfade als Eingabe.
+- `npm run test:i18n` und `npm run test:bridge`: nach Sandbox-Fehler
+  `spawn EPERM` außerhalb der Sandbox erfolgreich, insgesamt acht Tests.
+  `npm run typecheck`, `npx oxlint`, `git diff --check`: erfolgreich;
+  Typecheck meldet weiterhin den Router-Hinweis zum fehlenden `rootDir`.
+- `npm run build *> reorganization-spa-build.log` mit anschließendem
+  `Get-Content ... -Tail 15`: erfolgreich außerhalb der Sandbox.
+  Innerhalb der Sandbox konnte Vite den Sass-Prozess nicht laden.
+- `npx quasar build -m electron --skip-pkg *> reorganization-electron-build.log`
+  mit `Get-Content ... -Tail 20`: erfolgreich außerhalb der Sandbox;
+  Main, Preload und Oberfläche gebaut. Sandbox-Versuch scheiterte zuvor
+  an der Paketmanager-Erkennung.
+- Electron mit `Start-Process -FilePath
+  '.\src-electron\node_modules\electron\dist\electron.exe'
+  -ArgumentList 'tests/electron-bridge-smoke.cjs' -WindowStyle Hidden
+  -PassThru -Wait -RedirectStandardOutput '.\electron-bridge-smoke.log'
+  -RedirectStandardError '.\electron-bridge-smoke-error.log'` gestartet.
+  Logs mit `Get-Content` gelesen: IPC-Smoke-Test erfolgreich (Exitcode 0),
+  einschließlich erwarteter Fehlerweitergabe und fehlendem Node-Zugriff.
+  Test lädt intern `data:text/html,<html><body>Bridge smoke test</body></html>`.
+- `npm run lint:check` außerhalb der Sandbox: ausschließlich bestehende
+  Formatabweichung in `src-pwa/package.json`. README an die Struktur angepasst;
+  AGENTS.md unverändert. Keine weiteren externen URLs aufgerufen.
+- Temporäre Build-/Testlogs mit `Remove-Item -LiteralPath` entfernt.
+  Änderungen bleiben zur Prüfung im Arbeitsverzeichnis; kein Commit erstellt.
+
+- Zuerst `Get-Content AGENTS.md,ACTIONS.md,STRUCTURE-SNAPSHOT.md` ausgeführt;
+  nach erneuter Dokumentationsanweisung beide Richtliniendateien nochmals gelesen.
+- `git status --short`, `rg --files src src-electron src-pwa public tests` und
+  `Get-Content quasar.config.ts,tsconfig.json,package.json` für Ist-Struktur verwendet.
+  Mit `Get-FileHash` und dem Snapshot verschobene Dateien zugeordnet:
+  GUI unter `src/gui`, Infrastruktur unter `src/core`. Composable vom Benutzer
+  bereits angepasst; keine fehlende Anwendungsdatei festgestellt.
+- Imports, Router-/SCSS-/Alias-Konfiguration und Tests mit `Get-Content`/`rg`
+  geprüft. Lokale Quasar-Implementierung und Konfigurationstypen gelesen.
+  URL aufgerufen: https://quasar.dev/quasar-cli-vite/quasar-config-file/.
+- Per `apply_patch` Einstiegspunkte, Seitenrouting, Styles, Projektimporte,
+  Electron-Aliase und Test-Auflösung angepasst. `@/` bleibt `src`, `@electron/`
+  zeigt auf `src-electron`, `@root/` auf das Repository. SCSS-Weiterleitung
+  für Quasars automatische Theme-Erkennung ergänzt.
+- `npx quasar prepare`, `npm run typecheck`, `npm run test:i18n` und
+  `npm run test:bridge` zur ersten Prüfung gestartet. Wegen Unterbrechung war
+  der laufende Prozess über `write_stdin` nicht mehr verfügbar; Ergebnisse
+  werden erneut geprüft. Quasar benötigt für Boot-/CSS-Aliase seine
+  `~`-Markierung; diese wird beim Konfigurieren vollständiger `@`-Pfade ergänzt.
+
+## Struktur vor geplanter Umorganisation gesichert
+
+- Zuerst `Get-Content AGENTS.md,ACTIONS.md` ausgeführt. Datei-Inventar mit
+  `rg --files` und Import-/Konfigurationsstellen mit
+  `rg -n '(^import|from |import\(|require\(|preload:|boot:|css:|include:)' src src-electron quasar.config.ts tests`
+  geprüft; `git status --short` zeigte nur Änderungen an diesem Protokoll.
+- `STRUCTURE-SNAPSHOT.md` erstellt: aktuelle Verknüpfungen, neue Vorgabe zu
+  vollständigen Projektimporten ab `@`, Prüfungen nach der Umorganisation und
+  Datei-Inventar. Hierfür `rg --files src src-electron src-pwa public tests`,
+  `Get-FileHash -Algorithm SHA256`, `Sort-Object -Unique` und
+  `Set-Content -LiteralPath STRUCTURE-SNAPSHOT.md -Encoding utf8` verwendet.
+- Ergebnis: Struktur und Hashes zur späteren Wiedererkennung gesichert.
+  Noch keine Imports, Anwendungscode oder Ordner verändert. Keine URLs aufgerufen.
+
+## Dokumentationsvorgabe bestätigt
+
+- Zuerst `Get-Content -LiteralPath AGENTS.md,ACTIONS.md` ausgeführt;
+  beide Dateien vollständig gelesen.
+- Diesen Schritt mit `apply_patch` ergänzt. Keine URLs aufgerufen und
+  keinen Anwendungscode geändert. Weitere Aktionen werden mit Befehlen,
+  URLs und Ergebnissen kurz protokolliert.
+
 ## Electron-Bridge – Implementierung und laufende Prüfung
 
 - Zuerst `Get-Content AGENTS.md,ACTIONS.md` ausgeführt; nach erneuter

@@ -14,8 +14,8 @@
   ],
   "type": "module",
   "scripts": {
-    "test:bridge": "node --test tests/bridge.test.mjs",
-    "test:i18n": "node --test tests/lang-data.test.mjs",
+    "test:bridge": "node --import ./scripts/register-aliases.mjs --test tests/bridge.test.mjs",
+    "test:i18n": "node --import ./scripts/register-aliases.mjs --test tests/lang-data.test.mjs",
     "lint": "oxfmt && oxlint --fix",
     "lint:check": "oxfmt --check && oxlint",
     "dev": "quasar dev",

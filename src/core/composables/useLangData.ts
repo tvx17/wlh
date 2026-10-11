@@ -1,6 +1,6 @@
 import { getCurrentScope, inject, onScopeDispose } from "vue";
 import { useI18n } from "vue-i18n";
-import { langDataKey, type LangDataHandle } from "@/i18n/lang-data";
+import { langDataKey, type LangDataHandle } from "@/core/app/lang-data";
 
 /** Call synchronously in setup; also works in layouts and reusable elements. */
 export function useLangData() {

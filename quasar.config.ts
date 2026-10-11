@@ -4,6 +4,12 @@
 import { defineConfig } from "#q-app";
 
 export default defineConfig(ctx => {
+  // Quasar filesystem options need resolved paths; module imports use aliases.
+  const resolveSource = (aliasPath: string) =>
+    ctx.appPaths.resolve.src(aliasPath.slice(2));
+  // Quasar sourceFiles expects repository paths, not absolute filesystem paths.
+  const sourceEntry = (aliasPath: string) => `src/${aliasPath.slice(2)}`;
+  const quasarAsset = (aliasPath: string) => `~${aliasPath}`;
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -11,10 +17,17 @@ export default defineConfig(ctx => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ["i18n"],
+    boot: [quasarAsset("@/boot/i18n")],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
-    css: ["tailwind.css", "app.scss"],
+    css: [
+      quasarAsset("@/gui/css/tailwind.css"),
+      quasarAsset("@/gui/css/app.scss")
+    ],
+    sourceFiles: {
+      router: sourceEntry("@/core/router/index"),
+      store: sourceEntry("@/core/stores/index")
+    },
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
@@ -32,6 +45,10 @@ export default defineConfig(ctx => {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {
+      alias: {
+        "@electron": ctx.appPaths.resolve.app("src-electron"),
+        "@root": ctx.appPaths.appDir
+      },
       target: {
         // browser: 'baseline-widely-available',
         // node: 'node22'
@@ -44,7 +61,10 @@ export default defineConfig(ctx => {
       },
 
       // https://v2.quasar.dev/quasar-cli-vite/page-routing-with-vue-router#filename-based-routing
-      filenameBasedRouting: true,
+      filenameBasedRouting: {
+        routesFolder: resolveSource("@/gui/pages"),
+        dts: resolveSource("@/core/router/typed-router.d.ts")
+      },
 
       vueRouterMode: "hash", // available values: 'hash', 'history'
       // vueRouterBase,
@@ -75,7 +95,7 @@ export default defineConfig(ctx => {
             ssr: ctx.mode.ssr || ctx.mode.ssg,
 
             // you need to set i18n resource including paths !
-            include: [ctx.appPaths.resolve.app("src/i18n")]
+            include: [resolveSource("@/core/app/**/*.json")]
           }
         ]
       ]
@@ -113,8 +133,8 @@ export default defineConfig(ctx => {
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#sourcefiles
     // sourceFiles: {
     //   rootComponent: 'src/App.vue',
-    //   router: 'src/router/index',
-    //   store: 'src/store/index',
+    //   router: sourceEntry("@/core/router/index"),
+    //   store: sourceEntry("@/core/stores/index"),
     //   pwaRegisterServiceWorker: 'src-pwa/register-sw',
     //   pwaServiceWorker: 'src-pwa/sw/custom-sw',
     //   pwaManifestFile: 'src-pwa/manifest.json',

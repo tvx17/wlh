@@ -4,25 +4,9 @@ const assert = require("node:assert/strict");
 const path = require("node:path");
 const fs = require("node:fs");
 const vm = require("node:vm");
+const { pathToFileURL } = require("node:url");
 const { transpileModule, ModuleKind } = require("typescript");
 
-const compiled = transpileModule(
-  fs.readFileSync(path.join(__dirname, "../src-electron/execute.ts"), "utf8"),
-  { compilerOptions: { module: ModuleKind.CommonJS } }
-).outputText;
-const backend = { exports: {}, URL };
-vm.runInNewContext(compiled, backend);
-const execute = backend.exports.createExecutor(
-  new Map([
-    ["echo", payload => payload],
-    [
-      "fail",
-      () => {
-        throw new Error("Expected backend failure");
-      }
-    ]
-  ])
-);
 const pageUrl = "data:text/html,<html><body>Bridge smoke test</body></html>";
 const timeout = setTimeout(() => {
   console.error("Electron bridge smoke test timed out");
@@ -32,18 +16,39 @@ const timeout = setTimeout(() => {
 void app
   .whenReady()
   .then(async () => {
+    // Bootstrap alias resolution once, before resolving project files.
+    const { resolveProjectPath } = await import(
+      pathToFileURL(
+        path.join(path.dirname(__dirname), "scripts/register-aliases.mjs")
+      ).href
+    );
+    const compiled = transpileModule(
+      fs.readFileSync(resolveProjectPath("@electron/execute.ts"), "utf8"),
+      { compilerOptions: { module: ModuleKind.CommonJS } }
+    ).outputText;
+    const backend = { exports: {}, URL };
+    vm.runInNewContext(compiled, backend);
+    const execute = backend.exports.createExecutor(
+      new Map([
+        ["echo", payload => payload],
+        [
+          "fail",
+          () => {
+            throw new Error("Expected backend failure");
+          }
+        ]
+      ])
+    );
     // The built Quasar preload resolves its runtime paths synchronously.
     ipcMain.on("quasar-electron:resolve-electron-assets", (event, ...parts) => {
       event.returnValue = path.join(
-        __dirname,
-        "../src-electron/electron-assets",
+        resolveProjectPath("@electron/electron-assets"),
         ...parts
       );
     });
     ipcMain.on("quasar-electron:resolve-public", (event, ...parts) => {
       event.returnValue = path.join(
-        __dirname,
-        "../dist/electron/UnPackaged",
+        resolveProjectPath("@root/dist/electron/UnPackaged"),
         ...parts
       );
     });
@@ -53,9 +58,8 @@ void app
         contextIsolation: true,
         nodeIntegration: false,
         sandbox: true,
-        preload: path.join(
-          __dirname,
-          "../dist/electron/UnPackaged/electron-preload.cjs"
+        preload: resolveProjectPath(
+          "@root/dist/electron/UnPackaged/electron-preload.cjs"
         )
       }
     });

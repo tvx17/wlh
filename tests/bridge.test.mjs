@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { execute } from "../src/core/app/bridge.ts";
-import { createExecutor, isTrustedDocument } from "../src-electron/execute.ts";
+import { execute } from "@/core/app/bridge.ts";
+import { createExecutor, isTrustedDocument } from "@electron/execute.ts";
 
 await test("renderer forwards command, payload, result and backend failures", async () => {
   const backend = createExecutor(

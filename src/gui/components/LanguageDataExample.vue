@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { useLangData } from "@/composables/useLangData";
+import { useLangData } from "@/core/composables/useLangData";
 
 const { t, locale, loadLangData, changeLanguage } = useLangData();
 const ready = ref(false);
