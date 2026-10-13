@@ -21,7 +21,9 @@
     "dev": "quasar dev",
     "build": "quasar build",
     "typecheck": "vue-tsc --noEmit",
-    "postinstall": "quasar prepare --silent"
+    "postinstall": "quasar prepare --silent",
+    "dev:electron": "quasar dev -m electron",
+    "build:electron": "quasar build -m electron --skip-pkg"
   },
   "dependencies": {
     "@quasar/extras": "^2.0.3",

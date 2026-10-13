@@ -1,7 +1,10 @@
 <template>
   <router-view v-if="ready" />
-  <div v-else class="startup-screen">
-    <div class="wordmark">folio<span>.</span></div>
+  <div
+    v-else
+    class="tw:flex tw:min-h-screen tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+  >
+    <h1>Quasar App</h1>
     <q-spinner v-if="!failed" color="primary" size="24px" />
     <div v-else role="alert" class="tw:text-center">
       <p>Sprachdaten nicht erreichbar · Translations unavailable</p>
@@ -27,7 +30,7 @@ const failed = ref(false);
 async function load() {
   failed.value = false;
   try {
-    await loadLangData("studio", "gui", "studio");
+    await loadLangData("app", "", "app");
     ready.value = true;
   } catch {
     failed.value = true;

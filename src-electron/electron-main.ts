@@ -1,5 +1,6 @@
 import { BrowserWindow, app, ipcMain, type WebContents } from "electron";
 import path from "node:path";
+import { readTranslationFile, echoText } from "@electron/translations";
 import { pathToFileURL } from "node:url";
 import os from "node:os";
 import {
@@ -9,6 +10,7 @@ import {
 } from "@electron/execute";
 import {
   registerQuasarRuntime,
+  resolvePublicPath,
   resolveElectronAssetsPath
 } from "#q-app/electron/main";
 
@@ -18,6 +20,11 @@ const trustedWindows = new WeakMap<WebContents, string>();
 
 const execute = createExecutor(
   new Map<string, CommandHandler>([
+    ["echo", echoText],
+    [
+      "translations.read",
+      resource => readTranslationFile(resource, resolvePublicPath)
+    ],
     [
       "app.info",
       () => ({ name: app.getName(), version: app.getVersion(), platform })

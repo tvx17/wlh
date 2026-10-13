@@ -6,7 +6,6 @@ import {
   createWebHashHistory,
   createWebHistory
 } from "vue-router";
-import { useSessionStore } from "@/core/stores/session";
 
 /*
  * If not building with SSR mode, you can
@@ -32,15 +31,6 @@ export default defineRouter((/* { store, ssrContext } */) => {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE)
-  });
-
-  Router.beforeEach(to => {
-    const session = useSessionStore();
-    if (!session.signedIn && to.path !== "/login") {
-      return { path: "/login", query: { next: to.fullPath } };
-    }
-    if (session.signedIn && to.path === "/login") return "/";
-    return true;
   });
 
   // enable HMR for it

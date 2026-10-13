@@ -37,51 +37,11 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       Record<never, never>,
       | '//(index)'
-      | '//books'
-      | '//characters'
-      | '//editor'
-      | '//places'
-      | '//projects'
       | '//second'
     >,
     '//(index)': RouteRecordInfo<
       '//(index)',
       '/',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '//books': RouteRecordInfo<
-      '//books',
-      '/books',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '//characters': RouteRecordInfo<
-      '//characters',
-      '/characters',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '//editor': RouteRecordInfo<
-      '//editor',
-      '/editor',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '//places': RouteRecordInfo<
-      '//places',
-      '/places',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '//projects': RouteRecordInfo<
-      '//projects',
-      '/projects',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -98,13 +58,6 @@ declare module 'vue-router/auto-routes' {
       '/:path(.*)',
       { path: ParamValue<true> },
       { path: ParamValue<false> },
-      | never
-    >,
-    '/login': RouteRecordInfo<
-      '/login',
-      '/login',
-      Record<never, never>,
-      Record<never, never>,
       | never
     >,
   }
@@ -124,11 +77,6 @@ declare module 'vue-router/auto-routes' {
       routes:
         | '/'
         | '//(index)'
-        | '//books'
-        | '//characters'
-        | '//editor'
-        | '//places'
-        | '//projects'
         | '//second'
       views:
         | 'default'
@@ -138,46 +86,6 @@ declare module 'vue-router/auto-routes' {
     'src/gui/pages/index/(index).vue': {
       routes:
         | '//(index)'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
-    'src/gui/pages/index/books.vue': {
-      routes:
-        | '//books'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
-    'src/gui/pages/index/characters.vue': {
-      routes:
-        | '//characters'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
-    'src/gui/pages/index/editor.vue': {
-      routes:
-        | '//editor'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
-    'src/gui/pages/index/places.vue': {
-      routes:
-        | '//places'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
-    'src/gui/pages/index/projects.vue': {
-      routes:
-        | '//projects'
       views:
         | never
       pathParamNames:
@@ -198,14 +106,6 @@ declare module 'vue-router/auto-routes' {
         | never
       pathParamNames:
         | 'path'
-    }
-    'src/gui/pages/login.vue': {
-      routes:
-        | '/login'
-      views:
-        | never
-      pathParamNames:
-        | never
     }
   }
 

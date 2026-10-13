@@ -1,10 +1,9 @@
 <template>
-  <div class="page-content">
-    <q-btn color="primary" to="/" :label="t('studio.home')" no-caps />
-  </div>
+  <q-page class="flex flex-center">
+    <q-btn color="secondary" to="/" label="Go to Index Page" no-caps />
+  </q-page>
 </template>
 
 <script setup lang="ts">
-import { useStudioText } from "@/core/composables/useStudioText";
-const { t } = useStudioText();
+//
 </script>

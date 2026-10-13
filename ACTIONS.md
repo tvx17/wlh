@@ -422,3 +422,52 @@ Voraussetzung: Codex CLI im PATH, Anmeldung und lokal verfügbare Sitzungsdaten.
   Arbeitsverzeichnis anschließend sauber. Dieses Ergebnis mit `apply_patch`
   ergänzt und mittels `git add ACTIONS.md` und
   `git commit --amend --no-edit` in denselben Commit aufgenommen.
+
+## 2026-10-13 – Folio nach WLH übertragen, einfache Oberfläche als Vorlage eingerichtet
+
+Folio mit fachlichen Seiten, Mock-Daten, Stores, Sprachdateien und Bedienablauftest wurde nach `C:\Entwicklung\Projekte\WLH\vue\wlh` übertragen. Hier zeigt die Quasar-Vorlage jetzt die bisherige WLH-Demo: Deutsch/Englisch, einblendbare Komponente mit referenzgezählten Übersetzungen und Electron-Echo. Die GUI/Core-Aufteilung bleibt erhalten. Folio-spezifische Anmeldung, Stores und Daten wurden aus dieser Vorlage entfernt.
+
+Tailwind CSS ist weiterhin über Paketabhängigkeiten, Vite-Plugin und `src/gui/css/tailwind.css` aktiv, mit `tw:`-Präfix und ohne Preflight. Die Vorlage verwendet den bisherigen Sprachdienst mit `public/locales/{de,en}` und `execute` als Backend-API. Der neue Backend-Befehl `translations.read` lädt freigegebene JSON-Sprachdateien im ausgelieferten Electron-Build ohne HTTP-Server; Pfade und Echo-Eingaben werden validiert. README und AGENTS.md beschreiben die aktuelle Struktur und Dokumentationspflicht. `STRUCTURE-SNAPSHOT.md` bleibt als historisches Inventar erhalten.
+
+Lokale Quellsicherung vor dem Austausch: `C:\Entwicklung\Projekte\WLH\vue\wlh\.quasar\ui-transfer-20261013\backup\quasar`. Git-Historie und vorhandene Dokumentation bleiben erhalten. Abhängigkeiten wurden nicht aktualisiert.
+
+### Start und Bedienung
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\Boilerplates\Quasar'
+npm run dev -- --port 9001
+```
+
+Browser: [Vorlage](http://localhost:9001/#/). Deutsch/Englisch wechseln, Komponente aus-/einblenden und zweite Seite öffnen. Bei Portkonflikten die ausgegebene Adresse verwenden.
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\Boilerplates\Quasar'
+npm run dev:electron
+```
+
+In Electron zusätzlich Echo senden und Antworttext/Empfangszeit prüfen.
+
+### Ausgeführte Prüfungen
+
+Abschließendes Ergebnis: Alle 9 Dienst-/Bridge-Tests, Typprüfung, Format-/Codeprüfung, SPA-Build, Electron-Build und der gebaute Electron-Oberflächentest sind erfolgreich. Die Codeprüfung beanstandete einen ungebundenen Node-Pfadhelfer im neuen Test; der Aufruf wurde korrigiert. `git diff --check` ist erfolgreich.
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\Boilerplates\Quasar'
+npx quasar prepare
+npm run test:i18n
+npm run test:bridge
+npm run typecheck
+npm run lint:check
+npm run build
+npm run build:electron
+```
+
+5 Sprachdienst- und 4 Bridge-/Dateitransport-Testfälle, Typprüfung sowie SPA- und Electron-Build wurden geprüft. Der zusätzliche unsichtbare Oberflächentest lädt den gebauten Electron-Renderer und echten Preload; er prüft Sprachwechsel, Freigabe/erneutes Laden der Komponente, Echo, Tailwind-Stil und Navigation:
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\Boilerplates\Quasar'
+$smoke = Start-Process -FilePath '.\src-electron\node_modules\electron\dist\electron.exe' -ArgumentList 'tests/application-electron-smoke.cjs' -WindowStyle Hidden -PassThru -Wait
+if ($smoke.ExitCode -ne 0) { throw 'Electron-Oberflächentest fehlgeschlagen.' }
+```
+
+Prüfprotokolle liegen unter `.quasar/transfer-*.log`. Sandbox-Zugriffsbeschränkungen wurden durch freigegebene Prüfläufe außerhalb der Sandbox gelöst. Formatabweichungen, einschließlich der vorhandenen `src-pwa/package.json`, wurden korrigiert. Der bestehende Vue-Router-Hinweis zum fehlenden `rootDir` bleibt. Ein erster paralleler Oberflächentest meldete Cache-Zugriffshinweise; die Testprofile wurden daraufhin getrennt. Installer wurden nicht erstellt.

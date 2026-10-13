@@ -1,8 +1,8 @@
 {
   "name": "quasar-pwa-app",
   "version": "1.0.0",
-  "description": "Quasar PWA Folder",
   "private": true,
+  "description": "Quasar PWA Folder",
   "type": "module",
   "dependencies": {
     "register-service-worker": "^1.7.2"

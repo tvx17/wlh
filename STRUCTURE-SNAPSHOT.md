@@ -1,5 +1,7 @@
 # Struktur vor der Umorganisation
 
+Historisches Inventar: Nach dem Oberflächentausch am 2026-10-13 liegt Folio in WLH. Die aktuelle Quasar-Vorlage und ihre GUI/Core-Struktur sind in README.md beschrieben.
+
 ## Vorgaben für die anschließende Anpassung
 
 Projektinterne Imports mit vollständigem Alias-Pfad ab `@` schreiben.
