@@ -1,5 +1,9 @@
 # Projektregeln für Codex
 
+## Projektstruktur
+
+WLH enthält die Folio-Schreiboberfläche. GUI-Seiten, Komponenten und Styles liegen in `src/gui/`; Router, Stores, Dienste und Composables in `src/core/`. Verwende vollständige Import-Aliase `@/`, `@electron/` und `@root/`. Sprachdateien liegen unter `public/locales/`. Generierte Routentypen nicht manuell bearbeiten. Tailwind-Klassen verwenden das Präfix `tw:`; Preflight bleibt deaktiviert.
+
 ## Änderungsdokumentation
 
 - Dokumentiere alle von dir vorgenommenen Änderungen in `AENDERUNGEN.md`, auch Änderungen an Dokumentation, Konfiguration und Skripten.

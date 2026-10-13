@@ -23,19 +23,15 @@
  */
 
 import { contextBridge, ipcRenderer } from "electron";
-import {
-  ECHO_CHANNEL,
-  TRANSLATION_CHANNEL,
-  type DesktopApi
-} from "../src/shared/desktop";
+import type { AppBridge } from "@/core/app/bridge";
 import { quasarRuntime } from "#q-app/electron/preload";
 
 /**
  * Can be used in the renderer process through `window.quasarRuntime`
  */
 contextBridge.exposeInMainWorld("quasarRuntime", quasarRuntime);
-contextBridge.exposeInMainWorld("desktop", {
-  loadTranslation: (url: string) =>
-    ipcRenderer.invoke(TRANSLATION_CHANNEL, url),
-  echo: (text: string) => ipcRenderer.invoke(ECHO_CHANNEL, text)
-} satisfies DesktopApi);
+
+const appBridge: AppBridge = {
+  execute: (command, payload) => ipcRenderer.invoke("execute", command, payload)
+};
+contextBridge.exposeInMainWorld("appBridge", appBridge);

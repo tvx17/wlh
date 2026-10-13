@@ -14,15 +14,16 @@
   ],
   "type": "module",
   "scripts": {
+    "test:bridge": "node --import ./scripts/register-aliases.mjs --test tests/bridge.test.mjs",
+    "test:i18n": "node --import ./scripts/register-aliases.mjs --test tests/lang-data.test.mjs",
     "lint": "oxfmt && oxlint --fix",
     "lint:check": "oxfmt --check && oxlint",
     "dev": "quasar dev",
     "build": "quasar build",
     "typecheck": "vue-tsc --noEmit",
-    "test:i18n": "node --experimental-transform-types --test tests/i18n.test.mjs",
+    "postinstall": "quasar prepare --silent",
     "dev:electron": "quasar dev -m electron",
-    "build:electron": "quasar build -m electron --skip-pkg",
-    "postinstall": "quasar prepare --silent"
+    "build:electron": "quasar build -m electron --skip-pkg"
   },
   "dependencies": {
     "@quasar/extras": "^2.0.3",

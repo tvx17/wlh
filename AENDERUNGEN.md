@@ -1,5 +1,104 @@
 # Änderungsdokumentation
 
+## 2026-10-13 – Folio nach WLH übertragen und Quasar zur Vorlage zurückgeführt
+
+Die Folio-Schreiboberfläche wurde mit Mock-Daten, Session-/Studio-Stores, Styles, Sprachdateien, Router-Guard und Bedienablauftest aus Quasar nach WLH übertragen. Die bisherige einfache WLH-Oberfläche wurde in Quasar eingesetzt: Sprachwechsel, einblendbare Komponente und Electron-Echo. Beide Projekte behalten beziehungsweise verwenden jetzt die GUI/Core-Aufteilung. Quasar enthält keine Folio-Anmeldung oder fachlichen Folio-Daten mehr.
+
+Die gemeinsame Grundlage verwendet Quasars referenzgezählten Sprachdienst unter `src/core/app`, Sprachdateien unter `public/locales` und die allgemeine Electron-Brücke `execute`. Die alte WLH-API `window.desktop` und `useTranslationResource` wurde durch diese gemeinsame API ersetzt. Die Vorlagendemo verwendet `de`/`en` statt `de-de`/`en-us`. Für beide Projekte wurde ein gezielter Electron-Dateitransport ergänzt, damit die Sprachdateien auch im ausgelieferten Build ohne HTTP-Server geladen werden. Echo bleibt mit Text und Empfangszeit verfügbar. Backend-Eingaben und Dateipfade werden geprüft.
+
+Tailwind CSS ist in **beiden** Projekten vorhanden und aktiv: Paketabhängigkeiten, Vite-Plugin sowie `src/gui/css/tailwind.css`; Klassen mit `tw:`-Präfix, ohne Preflight. Paketnamen und Produktnamen bleiben projektspezifisch. Abhängigkeiten wurden nicht neu installiert oder aktualisiert. Quasar-Konfiguration, Testskripte, README und Projektregeln wurden an die neuen Rollen angepasst. Der frühere Vergleich in `PROJEKTVERGLEICH.md` ist als historischer Stand gekennzeichnet.
+
+### Lokale Sicherung
+
+Die ausgetauschten Quelldateien, Sprachressourcen, Tests und Konfigurationen beider Projekte liegen vor dem Austausch gesichert unter `.quasar/ui-transfer-20261013/backup/{quasar,wlh}` im WLH-Verzeichnis. Diese lokale Sicherung ist von Git ausgeschlossen. Die Git-Verzeichnisse und bisherigen Dokumentationseinträge bleiben erhalten. Browser-/Electron-Speicherdaten werden durch den Quellcodetransfer nicht zwischen Benutzerprofilen übertragen.
+
+### Start durch den Benutzer
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\WLH\vue\wlh'
+npm run dev -- --port 9000
+```
+
+Browser: [WLH/Folio](http://localhost:9000/#/). „Mit Beispielroman starten“ wählen, anschließend Dashboard, Projekte und Editor öffnen.
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\Boilerplates\Quasar'
+npm run dev -- --port 9001
+```
+
+Browser: [Quasar-Vorlage](http://localhost:9001/#/). Sprache wechseln und die Beispielkomponente ein-/ausblenden. Bei Portkonflikten die Adresse der Terminalausgabe verwenden.
+
+Electron jeweils im gewünschten Projektverzeichnis starten:
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\WLH\vue\wlh'
+npm run dev:electron
+```
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\Boilerplates\Quasar'
+npm run dev:electron
+```
+
+### Ausgeführte Prüfungen
+
+Abschließendes Ergebnis: In beiden Projekten sind alle 9 Dienst-/Bridge-Tests, Typprüfung, Format-/Codeprüfung, SPA-Build, Electron-Build und der gebaute Electron-Oberflächentest erfolgreich. In WLH ist zusätzlich der vollständige Folio-Bedienablauftest erfolgreich (Login, Navigation, Suche, Projektanlage, Editor, Notizen, Speicherung, Export, Fokusmodus und Desktop-/Mobile-Darstellung). Die Codeprüfung beanstandete einen ungebundenen Node-Pfadhelfer im neuen Test; dessen Aufruf wurde korrigiert. `git diff --check` ist in beiden Projekten erfolgreich.
+
+In beiden Projektverzeichnissen wurden Quasars generierte Dateien neu erstellt, Sprachdienst- und Bridge-Tests, Typprüfung sowie SPA- und Electron-Build ausgeführt. Pro Projekt bestehen 5 Sprachdienst- und 4 Bridge-/Dateitransport-Testfälle. Die vorhandenen Folio-Bedienabläufe werden nun in WLH geprüft; ein zusätzlicher Test lädt die gebauten Electron-Oberflächen mit dem echten Preload und den produktiven Backend-Hilfsfunktionen. Die Testfenster bleiben unsichtbar und verwenden isolierte Browserprofile.
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\WLH\vue\wlh'
+npx quasar prepare
+npm run test:i18n
+npm run test:bridge
+npm run typecheck
+npm run lint:check
+npm run build
+npm run build:electron
+```
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\Boilerplates\Quasar'
+npx quasar prepare
+npm run test:i18n
+npm run test:bridge
+npm run typecheck
+npm run lint:check
+npm run build
+npm run build:electron
+```
+
+Oberflächentest in beiden Projektverzeichnissen; zusätzlich Folio-Bedienablauftest in WLH:
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\WLH\vue\wlh'
+$smoke = Start-Process -FilePath '.\src-electron\node_modules\electron\dist\electron.exe' -ArgumentList 'tests/studio-smoke.cjs' -WindowStyle Hidden -PassThru -Wait
+if ($smoke.ExitCode -ne 0) { throw 'Folio-Bedienablauftest fehlgeschlagen.' }
+$smoke = Start-Process -FilePath '.\src-electron\node_modules\electron\dist\electron.exe' -ArgumentList 'tests/application-electron-smoke.cjs' -WindowStyle Hidden -PassThru -Wait
+if ($smoke.ExitCode -ne 0) { throw 'Electron-Oberflächentest fehlgeschlagen.' }
+```
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\Boilerplates\Quasar'
+$smoke = Start-Process -FilePath '.\src-electron\node_modules\electron\dist\electron.exe' -ArgumentList 'tests/application-electron-smoke.cjs' -WindowStyle Hidden -PassThru -Wait
+if ($smoke.ExitCode -ne 0) { throw 'Electron-Oberflächentest fehlgeschlagen.' }
+```
+
+Prüfprotokolle liegen jeweils unter `.quasar/transfer-*.log`; Folio-Vorschaubilder unter `.quasar/studio-preview` in WLH. Ein erster Sandbox-Lauf blockierte Build-/Format-Unterprozesse; diese Prüfungen wurden mit Freigabe außerhalb der Sandbox wiederholt. Formatabweichungen wurden korrigiert. Der erste neue Folio-Electron-Test suchte einen nur mobil vorhandenen Navigationsknopf im Desktop-Menü; der Test wurde auf den Editor-Routenaufruf korrigiert. Vue Router meldet weiterhin den bestehenden Hinweis auf ein nicht gesetztes `rootDir`. Installer und echte Serverauthentifizierung sind nicht Gegenstand dieser Migration.
+
+## 2026-10-13 – Drei Quasar-Projekte verglichen
+
+`PROJEKTVERGLEICH.md` dokumentiert den Vergleich von `QuasarTailwindDynamicLanguage`, `Quasar` und WLH anhand der lokalen Quellstände. Verglichen wurden Struktur, Paket- und Lockstände, Konfiguration, Übersetzungsdienste, Electron-Brücken, Oberfläche und vorhandene Tests. Die Datei enthält außerdem optionale Prüf-/Startbefehle mit Arbeitsverzeichnissen und Browser-Adresse.
+
+Ergebnis: gemeinsame technische Basis, aber unterschiedliche Sprachdienst-APIs und deutlich unterschiedlicher Anwendungsumfang. Quasar enthält die Folio-Schreiboberfläche; WLH ergänzt einen Electron-Dateiladeweg für Sprachdateien. Ein möglicher Prüfbedarf für Quasars Sprachladen im ausgelieferten Electron-Build ist als Codeableitung gekennzeichnet.
+
+Ausgeführt wurden ausschließlich lesende Quellcode-/Konfigurationsprüfungen sowie eine Prüfung der Dokumentationsänderungen. Keine Anwendungstests, Builds oder Browserstarts; beide Boilerplate-Projekte bleiben unverändert. Abschließender Prüfbefehl:
+
+```powershell
+Set-Location 'C:\Entwicklung\Projekte\WLH\vue\wlh'
+git diff --check
+```
+
 ## 2026-10-11 – Aktuelle Sitzung mit resume-session.ps1 fortsetzen
 
 Die vorhandenen Projektregeln, die Änderungsdokumentation und das bisherige Sitzungsskript wurden gelesen. Zuvor wurde die Existenz von `AGENTS.md` geprüft; die vorhandene Datei blieb unverändert. Alle Änderungen dieser Aufgabe sind hier dokumentiert.

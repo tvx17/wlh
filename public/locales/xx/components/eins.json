@@ -1,0 +1,5 @@
+{
+  "welcome": "[xx] Welcome, {name}!",
+  "failed": "[xx] Action failed",
+  "success": "[xx] Action was successful"
+}

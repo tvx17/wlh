@@ -1,12 +1,13 @@
-import { BrowserWindow, app, ipcMain } from "electron";
-import {
-  ECHO_CHANNEL,
-  TRANSLATION_CHANNEL,
-  type EchoResponse
-} from "../src/shared/desktop";
-import { readFile } from "node:fs/promises";
+import { BrowserWindow, app, ipcMain, type WebContents } from "electron";
 import path from "node:path";
+import { readTranslationFile, echoText } from "@electron/translations";
+import { pathToFileURL } from "node:url";
 import os from "node:os";
+import {
+  createExecutor,
+  isTrustedDocument,
+  type CommandHandler
+} from "@electron/execute";
 import {
   registerQuasarRuntime,
   resolvePublicPath,
@@ -15,6 +16,21 @@ import {
 
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform();
+const trustedWindows = new WeakMap<WebContents, string>();
+
+const execute = createExecutor(
+  new Map<string, CommandHandler>([
+    ["echo", echoText],
+    [
+      "translations.read",
+      resource => readTranslationFile(resource, resolvePublicPath)
+    ],
+    [
+      "app.info",
+      () => ({ name: app.getName(), version: app.getVersion(), platform })
+    ]
+  ])
+);
 
 async function createWindow() {
   /**
@@ -34,11 +50,10 @@ async function createWindow() {
     }
   });
 
-  mainWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
-  mainWindow.webContents.on("will-navigate", (event, url) => {
-    if (url.split("#")[0] !== mainWindow.webContents.getURL().split("#")[0])
-      event.preventDefault();
-  });
+  const trustedUrl = import.meta.env.QUASAR_DEV
+    ? import.meta.env.QUASAR_APP_URL
+    : pathToFileURL(path.join(app.getAppPath(), "index.html")).href;
+  trustedWindows.set(mainWindow.webContents, trustedUrl);
 
   if (import.meta.env.QUASAR_DEV) {
     await mainWindow.loadURL(import.meta.env.QUASAR_APP_URL);
@@ -59,28 +74,16 @@ async function createWindow() {
 
 void app.whenReady().then(() => {
   registerQuasarRuntime();
-  ipcMain.handle(TRANSLATION_CHANNEL, async (event, url: unknown) => {
-    const window = BrowserWindow.fromWebContents(event.sender);
-    if (!window || event.senderFrame !== window.webContents.mainFrame)
-      throw new Error("Invalid IPC sender");
+  ipcMain.handle("execute", (event, command: unknown, payload: unknown) => {
+    const expectedUrl = trustedWindows.get(event.sender);
     if (
-      typeof url !== "string" ||
-      !/^i18n\/[a-z]{2,3}-[a-z0-9]{2,8}\/[a-z0-9_-]+(?:\/[a-z0-9_-]+)*\.json$/.test(
-        url
-      )
-    )
-      throw new Error("Invalid translation path");
-    return JSON.parse(
-      await readFile(resolvePublicPath(...url.split("/")), "utf8")
-    );
-  });
-  ipcMain.handle(ECHO_CHANNEL, (event, text: unknown): EchoResponse => {
-    const window = BrowserWindow.fromWebContents(event.sender);
-    if (!window || event.senderFrame !== window.webContents.mainFrame)
-      throw new Error("Invalid IPC sender");
-    if (typeof text !== "string" || text.length > 2000)
-      throw new Error("Expected text with at most 2000 characters");
-    return { text, receivedAt: new Date().toISOString() };
+      !expectedUrl ||
+      event.senderFrame !== event.sender.mainFrame ||
+      !isTrustedDocument(event.senderFrame.url, expectedUrl)
+    ) {
+      throw new Error("Unauthorized execute request");
+    }
+    return execute(command, payload);
   });
   void createWindow();
 
